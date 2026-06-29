@@ -51,12 +51,7 @@ $$
 
 $$
 x_{t+1} = x_{t} + v_{t+1} \Delta t 
-$
-
-https://github.com/user-attachments/assets/e4a12cb9-d7d6-44dc-bd75-0b202437fdaf
-
-
-$
+$$
 
 # <font style="color:rgb(15, 17, 21);">实验实现</font>
 ## <font style="color:rgb(15, 17, 21);">场景初始化（GPU同步）</font>
@@ -420,23 +415,20 @@ if not paused:
 
 ## 实验结果展示
 k_s=10000, K_d=0.1
-
-
+https://github.com/user-attachments/assets/c73a7683-abc9-4b03-a81c-9dbb899bfb3c
 
 k_s=10000,k_d=1.0
-
-
+https://github.com/user-attachments/assets/f7ece621-f690-452e-b7a2-d90c24b11ae9
 
 k_s=10000,k_d=5.0
-
-
+https://github.com/user-attachments/assets/e51b10b7-1aa7-4963-b10d-c3674cc306c7
 
 k_d =1.0,k_s=1000
-
-
+https://github.com/user-attachments/assets/1feae2b3-3709-4707-9c9a-627d0207254e
 
 k_d=1.0,k_s=10000
-
-
+https://github.com/user-attachments/assets/bb5c8379-eb01-45d7-8e54-a59bbf7c4e96
 
 k_d=1.0,k_s=100000
+https://github.com/user-attachments/assets/b906d992-0d23-4b05-a81e-998807cec36f
+
