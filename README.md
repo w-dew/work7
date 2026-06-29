@@ -302,7 +302,7 @@ def step_implicit_iter():
 **<font style="color:rgb(15, 17, 21);">优化要点</font>**<font style="color:rgb(15, 17, 21);">：</font>
 
 + <font style="color:rgb(15, 17, 21);">所有计算合并到单个kernel，每帧仅启动3次kernel（显式/半隐式1次，隐式4次）</font>
-+ `<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">ti.static</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">在编译期展开循环，无运行时开销</font>
++ ti.static在编译期展开循环，无运行时开销</font>
 + <font style="color:rgb(15, 17, 21);">使用独立缓存场x_next/v_next/f_next避免数据污染</font>
 
 ## <font style="color:rgb(15, 17, 21);">渲染与GGUI交互</font>
