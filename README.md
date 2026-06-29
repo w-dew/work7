@@ -7,7 +7,7 @@
 1. **<font style="color:rgb(15, 17, 21);">掌握动态场景渲染</font>**<font style="color:rgb(15, 17, 21);">：学习使用 Taichi GGUI 构建 3D 交互式场景，实现实时物理模拟的可视化</font>
 2. **<font style="color:rgb(15, 17, 21);">理解质点-弹簧模型</font>**<font style="color:rgb(15, 17, 21);">：深入理解基于物理的弹力与阻尼力计算方法，掌握数值爆炸问题的处理策略</font>
 3. **<font style="color:rgb(15, 17, 21);">对比数值积分方法</font>**<font style="color:rgb(15, 17, 21);">：独立实现并比较三种数值积分求解器（显式欧拉、半隐式欧拉、隐式欧拉），分析其稳定性差异</font>
-4. **<font style="color:rgb(15, 17, 21);">理解 GPU 编程基础</font>**<font style="color:rgb(15, 17, 21);">：学习 Taichi 中的</font><font style="color:rgb(15, 17, 21);"> </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">ti.kernel</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">与</font><font style="color:rgb(15, 17, 21);"> </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">ti.func</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">的使用，了解并行计算中的状态同步与性能优化</font>
+4. **<font style="color:rgb(15, 17, 21);">理解 GPU 编程基础</font>**<font style="color:rgb(15, 17, 21);">：学习 Taichi 中的ti.kernel与ti.func的使用，了解并行计算中的状态同步与性能优化</font>
 
 # <font style="color:rgb(15, 17, 21);"> 实验原理</font>
 ## <font style="color:rgb(15, 17, 21);"> 质点-弹簧模型</font>
@@ -17,21 +17,23 @@ $$
 f_{a} = -k_{s} (|x_a - x_b| - l) \frac{x_a - x_b}{|x_a - x_b|} 
 $$
 
-<font style="color:rgb(15, 17, 21);">其中 </font>_<font style="color:rgb(15, 17, 21);">ks</font>_<font style="color:rgb(15, 17, 21);"> 为弹簧劲度系数，</font>_<font style="color:rgb(15, 17, 21);">l</font>_<font style="color:rgb(15, 17, 21);"> 为弹簧原长，</font>_<font style="color:rgb(15, 17, 21);">x</font>_<font style="color:rgb(15, 17, 21);"> 为质点位置。为保证系统稳定性，引入速度阻尼力：</font>
+<font style="color:rgb(15, 17, 21);">其中 ks为弹簧劲度系数,l为弹簧原长,x为质点位置。为保证系统稳定性，引入速度阻尼力：</font>
 
 $$
 f_{d} = -k_{d} v_{a} 
 $$
 
 ## <font style="color:rgb(15, 17, 21);"> 数值积分方法</font>
-<font style="color:rgb(15, 17, 21);">根据牛顿第二定律 </font>_<font style="color:rgb(15, 17, 21);">a</font>_<font style="color:rgb(15, 17, 21);">=</font>_<font style="color:rgb(15, 17, 21);">F</font>_<font style="color:rgb(15, 17, 21);">/</font>_<font style="color:rgb(15, 17, 21);">m</font>_<font style="color:rgb(15, 17, 21);">，通过数值积分在离散时间步 Δ</font>_<font style="color:rgb(15, 17, 21);">t</font>_<font style="color:rgb(15, 17, 21);"> 内更新质点状态：</font>
+<font style="color:rgb(15, 17, 21);">根据牛顿第二定律a=F/m，通过数值积分在离散时间步 Δ</font>_<font style="color:rgb(15, 17, 21);">t</font>_<font style="color:rgb(15, 17, 21);"> 内更新质点状态：</font>
 
 + **<font style="color:rgb(15, 17, 21);">显式欧拉 </font>**<font style="color:rgb(15, 17, 21);">：完全使用当前时刻状态预测下一时刻，易发散。  
 $$
 x_{t+1} = x_{t} + v_{t} \Delta t
 $$
 
-<font style="color:rgb(15, 17, 21);">      </font>$ v_{t+1} = v_{t} + a_{t} \Delta t $<font style="color:rgb(15, 17, 21);"></font>
+$$ 
+v_{t+1} = v_{t} + a_{t} \Delta t 
+$$
 
 + **<font style="color:rgb(15, 17, 21);">半隐式欧拉 </font>**<font style="color:rgb(15, 17, 21);">：先更新速度，再用新速度更新位置，比显式欧拉更稳定。</font>
 
@@ -89,7 +91,7 @@ num_springs = ti.field(dtype=int, shape=())
 
 **<font style="color:rgb(15, 17, 21);">拆分的初始化Kernel</font>**
 
-<font style="color:rgb(15, 17, 21);">为了保证GPU多线程计算时的状态同步，将初始化操作拆分为三个独立的</font><font style="color:rgb(15, 17, 21);"> </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">@ti.kernel</font>`<font style="color:rgb(15, 17, 21);">：</font>
+<font style="color:rgb(15, 17, 21);">为了保证GPU多线程计算时的状态同步，将初始化操作拆分为三个独立的@ti.kernel
 
 1. **<font style="color:rgb(15, 17, 21);">位置初始化 Kernel</font>**<font style="color:rgb(15, 17, 21);">：</font>
 
@@ -161,7 +163,7 @@ def init_cloth():
 ## <font style="color:rgb(15, 17, 21);">力学计算与防爆处理</font>
 **<font style="color:rgb(15, 17, 21);">综合力计算函数</font>**
 
-<font style="color:rgb(15, 17, 21);">使用 </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">@ti.func</font>`<font style="color:rgb(15, 17, 21);"> 实现受力计算，该函数会被内联到调用它的kernel中，减少GPU函数调用开销：</font>
+<font style="color:rgb(15, 17, 21);">使用@ti.func实现受力计算，该函数会被内联到调用它的kernel中，减少GPU函数调用开销：</font>
 
 ```plain
 @ti.func
@@ -209,8 +211,8 @@ def clamp_velocity(vel: ti.template(), idx: int):
 
 **<font style="color:rgb(15, 17, 21);">设计要点</font>**<font style="color:rgb(15, 17, 21);">：</font>
 
-+ <font style="color:rgb(15, 17, 21);">使用</font><font style="color:rgb(15, 17, 21);"> </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">ti.func</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">声明实现编译期内联，消除函数调用开销</font>
-+ <font style="color:rgb(15, 17, 21);">原子操作</font><font style="color:rgb(15, 17, 21);"> </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">ti.atomic_add</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">保证多线程累加时的数据一致性</font>
++ <font style="color:rgb(15, 17, 21);">使用ti.func声明实现编译期内联，消除函数调用开销</font>
++ <font style="color:rgb(15, 17, 21);">原子操作ti.atomic_add保证多线程累加时的数据一致性</font>
 + <font style="color:rgb(15, 17, 21);">速度钳制作为安全机制，防止任何方法下的数值发散</font>
 
 ## <font style="color:rgb(15, 17, 21);"> 积分求解器实现</font>
@@ -301,7 +303,7 @@ def step_implicit_iter():
 
 + <font style="color:rgb(15, 17, 21);">所有计算合并到单个kernel，每帧仅启动3次kernel（显式/半隐式1次，隐式4次）</font>
 + `<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">ti.static</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">在编译期展开循环，无运行时开销</font>
-+ <font style="color:rgb(15, 17, 21);">使用独立缓存场</font><font style="color:rgb(15, 17, 21);"> </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">x_next/v_next/f_next</font>`<font style="color:rgb(15, 17, 21);"> </font><font style="color:rgb(15, 17, 21);">避免数据污染</font>
++ <font style="color:rgb(15, 17, 21);">使用独立缓存场x_next/v_next/f_next避免数据污染</font>
 
 ## <font style="color:rgb(15, 17, 21);">渲染与GGUI交互</font>
 **<font style="color:rgb(15, 17, 21);">3D场景构建</font>**
@@ -338,7 +340,7 @@ def main():
 
 **<font style="color:rgb(15, 17, 21);">交互控制面板</font>**
 
-<font style="color:rgb(15, 17, 21);">使用 </font>`<font style="color:rgb(15, 17, 21);background-color:rgb(235, 238, 242);">window.GUI</font>`<font style="color:rgb(15, 17, 21);"> 实现完整的控制界面：</font>
+<font style="color:rgb(15, 17, 21);">使用window.GUI实现完整的控制界面：</font>
 
 ```plain
 # GUI控制面板
